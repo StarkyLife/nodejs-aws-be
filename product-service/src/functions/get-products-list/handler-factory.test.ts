@@ -6,10 +6,11 @@ import { productsListGetterFactory } from './handler-factory';
 describe('Lambda for getting products list', () => {
     async function testLambda(
         productsGetter: ProductsListGetter,
-        expectedResponse: APIGatewayProxyStructuredResultV2
+        expectedResponse: APIGatewayProxyStructuredResultV2,
     ) {
         const getProductsList = productsListGetterFactory(productsGetter);
         const actualResponse = await getProductsList(null, null, null);
+
         expect(actualResponse).toEqual(expectedResponse);
     }
 
@@ -26,6 +27,7 @@ describe('Lambda for getting products list', () => {
             const stringifiedProductsListResponse = JSON.stringify({
                 products: testProductsList,
             });
+
             await testLambda(productsGetterStubReturningProducts, {
                 statusCode: 200,
                 body: stringifiedProductsListResponse,
@@ -36,7 +38,7 @@ describe('Lambda for getting products list', () => {
         let productsGetterStubThrowingError: ProductsListGetter;
 
         beforeEach(() => {
-            productsGetterStubThrowingError = jest.fn(() => { throw new Error() });
+            productsGetterStubThrowingError = jest.fn(() => { throw new Error(); });
         });
 
         it('should return response with status code = 500', async () => {

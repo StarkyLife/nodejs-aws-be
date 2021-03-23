@@ -5,7 +5,7 @@ import { ProductsListGetter } from '@core/products-service-types';
 export function productsListGetterFactory(
     productsGetter: ProductsListGetter,
 ): APIGatewayProxyHandlerV2 {
-    return async () => {
+    return async function getProductsListLambda() {
         try {
             const products = productsGetter();
 

@@ -19,7 +19,7 @@ describe('Lambda for getting products list', () => {
         let productsGetterStubReturningProducts: ProductsListGetter;
 
         beforeEach(() => {
-            testProductsList = [{ name: 'product 1' }];
+            testProductsList = [{ id: '1', title: 'product 1', price: 5 }];
             productsGetterStubReturningProducts = jest.fn(() => testProductsList);
         });
 

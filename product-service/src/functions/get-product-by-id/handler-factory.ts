@@ -1,6 +1,6 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { CanGetProductById } from '@core/products-service-types';
-import { formatJSONResponse } from '@libs/apiGateway';
+import { createLambdaResponse } from '@libs/apiGateway';
 
 export function createLambdaForGettingProductById(
     service: CanGetProductById,
@@ -10,12 +10,12 @@ export function createLambdaForGettingProductById(
             const product = service.getProductById(pathParameters.productId);
 
             if (!product) {
-                return { statusCode: 404, body: 'Product not found' };
+                return createLambdaResponse.default(404, 'Product not found');
             }
 
-            return formatJSONResponse({ product });
+            return createLambdaResponse.json(200, product);
         } catch (error) {
-            return { statusCode: 500 };
+            return createLambdaResponse.default(500);
         }
     };
 }

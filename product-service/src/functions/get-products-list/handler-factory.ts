@@ -1,5 +1,5 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
-import { formatJSONResponse } from '@libs/apiGateway';
+import { createLambdaResponse } from '@libs/apiGateway';
 import { CanGetProductsList } from '@core/products-service-types';
 
 export function createGetProductsListLambda(
@@ -9,9 +9,9 @@ export function createGetProductsListLambda(
         try {
             const products = service.getProductsList();
 
-            return formatJSONResponse({ products });
+            return createLambdaResponse.json(200, products);
         } catch (error) {
-            return { statusCode: 500 };
+            return createLambdaResponse.default(500);
         }
     };
 }

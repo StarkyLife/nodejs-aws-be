@@ -1,5 +1,6 @@
 import { Product } from '@core/product-model';
 import { CanGetProductById } from '@core/products-service-types';
+import { CORS_HEADERS } from '@libs/cors-headers';
 import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { createLambdaForGettingProductById } from './handler-factory';
 
@@ -51,7 +52,10 @@ describe('Lambda for getting product by id', () => {
             null,
         );
 
-        expect(response).toEqual(expectedResponse);
+        expect(response).toEqual({
+            ...expectedResponse,
+            headers: CORS_HEADERS,
+        });
     }
 
     describe('Given function throwing error', () => {
@@ -74,7 +78,7 @@ describe('Lambda for getting product by id', () => {
                 productByIdGetterMock.returningProduct,
                 {
                     statusCode: 200,
-                    body: JSON.stringify({ product: productByIdGetterMock.TEST_PRODUCT }),
+                    body: JSON.stringify(productByIdGetterMock.TEST_PRODUCT),
                 },
             );
             expect(productByIdGetterMock.returningProduct.getProductById).toHaveBeenCalledWith(testProductId);

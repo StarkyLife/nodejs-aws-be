@@ -1,5 +1,6 @@
 import { Product } from '@core/product-model';
 import { CanGetProductsList } from '@core/products-service-types';
+import { CORS_HEADERS } from '@libs/cors-headers';
 import { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { createGetProductsListLambda } from './handler-factory';
 
@@ -11,7 +12,10 @@ describe('Lambda for getting products list', () => {
         const getProductsList = createGetProductsListLambda(productsService);
         const actualResponse = await getProductsList(null, null, null);
 
-        expect(actualResponse).toEqual(expectedResponse);
+        expect(actualResponse).toEqual({
+            ...expectedResponse,
+            headers: CORS_HEADERS,
+        });
     }
 
     describe('Given function that returns array of products', () => {
@@ -26,9 +30,7 @@ describe('Lambda for getting products list', () => {
         });
 
         it('should return response with status code = 200 and body = products list', async () => {
-            const stringifiedProductsListResponse = JSON.stringify({
-                products: testProductsList,
-            });
+            const stringifiedProductsListResponse = JSON.stringify(testProductsList);
 
             await testLambda(productsServiceMockReturningProducts, {
                 statusCode: 200,

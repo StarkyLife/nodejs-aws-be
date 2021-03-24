@@ -1,9 +1,10 @@
 import { Product } from './product-model';
 
-export interface ProductsService {
+export interface CanGetProductsList {
     getProductsList: () => Product[];
+}
+export interface CanGetProductById {
     getProductById: (productId: string) => Product | null;
 }
 
-export type ProductsListGetter = ProductsService['getProductsList'];
-export type ProductByIdGetter = ProductsService['getProductById'];
+export interface ProductsService extends CanGetProductsList, CanGetProductById { }

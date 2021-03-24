@@ -1,13 +1,13 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { formatJSONResponse } from '@libs/apiGateway';
-import { ProductsListGetter } from '@core/products-service-types';
+import { CanGetProductsList } from '@core/products-service-types';
 
-export function productsListGetterFactory(
-    productsGetter: ProductsListGetter,
+export function createGetProductsListLambda(
+    service: CanGetProductsList,
 ): APIGatewayProxyHandlerV2 {
     return async function getProductsListLambda() {
         try {
-            const products = productsGetter();
+            const products = service.getProductsList();
 
             return formatJSONResponse({ products });
         } catch (error) {

@@ -1,5 +1,5 @@
 import { Product } from '@core/product-model';
-import { CanGetProductById } from '@core/products-service-types';
+import { CanGetProductById } from '@core/products-gateway';
 import { CORS_HEADERS } from '@libs/cors-headers';
 import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { createLambdaForGettingProductById } from './handler-factory';

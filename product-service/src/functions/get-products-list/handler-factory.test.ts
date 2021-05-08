@@ -1,8 +1,10 @@
 import { Product } from '@core/product-model';
-import { CanGetProductsList } from '@core/products-service-types';
+import { CanGetProductsList } from '@core/products-gateway';
 import { CORS_HEADERS } from '@libs/cors-headers';
 import { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { createGetProductsListLambda } from './handler-factory';
+
+const TEST_PRODUCTS_LIST: Product[] = [{ id: '1', title: 'product 1', price: 5 }];
 
 describe('Lambda for getting products list', () => {
     async function testLambda(
@@ -19,18 +21,16 @@ describe('Lambda for getting products list', () => {
     }
 
     describe('Given function that returns array of products', () => {
-        let testProductsList: Product[];
         let productsServiceMockReturningProducts: CanGetProductsList;
 
         beforeEach(() => {
-            testProductsList = [{ id: '1', title: 'product 1', price: 5 }];
             productsServiceMockReturningProducts = {
-                getProductsList: jest.fn(() => testProductsList),
+                getProductsList: jest.fn(() => TEST_PRODUCTS_LIST),
             };
         });
 
         it('should return response with status code = 200 and body = products list', async () => {
-            const stringifiedProductsListResponse = JSON.stringify(testProductsList);
+            const stringifiedProductsListResponse = JSON.stringify(TEST_PRODUCTS_LIST);
 
             await testLambda(productsServiceMockReturningProducts, {
                 statusCode: 200,

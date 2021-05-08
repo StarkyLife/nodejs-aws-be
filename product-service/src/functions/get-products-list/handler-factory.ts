@@ -1,6 +1,6 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { createLambdaResponse } from '@libs/apiGateway';
-import { CanGetProductsList } from '@core/products-service-types';
+import { CanGetProductsList } from '@core/products-gateway';
 
 export function createGetProductsListLambda(
     service: CanGetProductsList,

@@ -7,4 +7,4 @@ export interface CanGetProductById {
     getProductById: (productId: string) => Product | null;
 }
 
-export interface ProductsService extends CanGetProductsList, CanGetProductById { }
+export interface ProductsGateway extends CanGetProductsList, CanGetProductById { }

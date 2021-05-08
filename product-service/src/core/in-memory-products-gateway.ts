@@ -1,7 +1,7 @@
 import { productsMockList } from './products-mocks';
-import { ProductsService } from './products-service-types';
+import { ProductsGateway } from './products-gateway';
 
-export const productsService: ProductsService = {
+export const inMemoryProductsGateway: ProductsGateway = {
     getProductsList() {
         return productsMockList;
     },

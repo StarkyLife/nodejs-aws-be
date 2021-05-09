@@ -7,7 +7,7 @@ export function createGetProductsListLambda(
 ): APIGatewayProxyHandlerV2 {
     return async function getProductsListLambda() {
         try {
-            const products = service.getProductsList();
+            const products = await service.getProductsList();
 
             return createLambdaResponse.json(200, products);
         } catch (error) {

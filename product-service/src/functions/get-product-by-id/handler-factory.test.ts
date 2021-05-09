@@ -25,13 +25,13 @@ function createProductsServiceMock(productId: string) {
     return {
         TEST_PRODUCT,
         throwingError: {
-            getProductById: jest.fn(() => { throw new Error(); }),
+            getProductById: jest.fn(() => Promise.reject(new Error())),
         } as CanGetProductById,
         returningProduct: {
-            getProductById: jest.fn(() => TEST_PRODUCT),
+            getProductById: jest.fn(() => Promise.resolve(TEST_PRODUCT)),
         } as CanGetProductById,
         returningNull: {
-            getProductById: jest.fn(() => null),
+            getProductById: jest.fn(() => Promise.resolve(null)),
         } as CanGetProductById,
     };
 }

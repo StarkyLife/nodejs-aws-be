@@ -25,7 +25,7 @@ describe('Lambda for getting products list', () => {
 
         beforeEach(() => {
             productsServiceMockReturningProducts = {
-                getProductsList: jest.fn(() => TEST_PRODUCTS_LIST),
+                getProductsList: jest.fn(() => Promise.resolve(TEST_PRODUCTS_LIST)),
             };
         });
 
@@ -43,7 +43,7 @@ describe('Lambda for getting products list', () => {
 
         beforeEach(() => {
             productsServiceMockThrowingError = {
-                getProductsList: jest.fn(() => { throw new Error(); }),
+                getProductsList: jest.fn(() => Promise.reject(new Error())),
             };
         });
 

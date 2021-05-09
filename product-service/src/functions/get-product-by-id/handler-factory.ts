@@ -7,7 +7,7 @@ export function createLambdaForGettingProductById(
 ): APIGatewayProxyHandlerV2 {
     return async function getProductByIdLambda({ pathParameters }) {
         try {
-            const product = service.getProductById(pathParameters.productId);
+            const product = await service.getProductById(pathParameters.productId);
 
             if (!product) {
                 return createLambdaResponse.default(404, 'Product not found');

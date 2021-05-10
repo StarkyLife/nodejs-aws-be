@@ -2,7 +2,7 @@ import { Client } from 'pg';
 import { Product } from './product-model';
 import { ProductsGateway } from './products-gateway';
 
-type PostgresDBInfo = {
+export type PostgresDBConnection = {
     host: string;
     port: number;
     database: string;
@@ -11,7 +11,7 @@ type PostgresDBInfo = {
 };
 
 export class PostgresProductsGateway implements ProductsGateway {
-    constructor(private dbInfo: PostgresDBInfo) {}
+    constructor(private dbInfo: PostgresDBConnection) {}
 
     async getProductsList() {
         const products = await this.makeQuery<Product>('select id, count, title, description, price from stocks s left join products p on p.id = s.product_id');

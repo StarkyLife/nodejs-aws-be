@@ -1,19 +1,9 @@
 import { Product } from '@core/product-model';
 import { CanGetProductById } from '@core/products-gateway';
 import { CORS_HEADERS } from '@libs/cors-headers';
-import { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { createLambdaForGettingProductById } from './handler-factory';
-
-const emptyAPIGatewayEvent: APIGatewayProxyEventV2 = {
-    version: '',
-    routeKey: '',
-    rawPath: '',
-    rawQueryString: '',
-    headers: null,
-    requestContext: null,
-    pathParameters: null,
-    isBase64Encoded: false,
-};
+import { EMPTY_API_GATEWAY_EVENT } from '@libs/doubles/api-gateway-mocks';
+import { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
+import { createLambdaForGettingProductById } from './handler';
 
 function createProductsServiceMock(productId: string) {
     const TEST_PRODUCT: Product = {
@@ -47,7 +37,7 @@ async function testLambda(
     const getProductByIdLambda = createLambdaForGettingProductById(productsService);
     const response = await getProductByIdLambda(
         {
-            ...emptyAPIGatewayEvent,
+            ...EMPTY_API_GATEWAY_EVENT,
             pathParameters: { productId },
         },
         null,
@@ -69,7 +59,7 @@ describe('Given function throwing error', () => {
             productByIdGetterMock.throwingError,
             {
                 statusCode: 500,
-                body: productByIdGetterMock.THROWEN_ERROR.message,
+                body: productByIdGetterMock.THROWEN_ERROR.stack,
             },
         );
     });

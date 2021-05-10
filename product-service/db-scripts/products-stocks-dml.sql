@@ -5,6 +5,6 @@ insert into products (title, description, price) values
 ('Темная сторона', 'То, что ты видишь, это лишь малая часть того, что есть!', 8);
 
 insert into stocks (product_id, count) values
-('09dc4c2e-b941-458a-9e0b-2d8f07271a93', 2),
-('1720b729-02f5-4acf-b116-64dc5df93da1', 1),
-('51674735-2b55-4d7e-bb79-1f49e4f3b262', 3);
+('1e43b936-3f67-4f29-843a-8107b586dafc', 2),
+('c06d4be9-9528-4943-9450-4230e8ac7cec', 1),
+('e14f166d-9491-46a9-a425-16f1d3cb5292', 3);

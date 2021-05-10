@@ -2,7 +2,7 @@ import { CanGetProductsList } from '@core/products-gateway';
 import { CORS_HEADERS } from '@libs/cors-headers';
 import { TEST_PRODUCTS } from '@libs/doubles/products-mocks';
 import { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { createGetProductsListLambda } from './handler-factory';
+import { createGetProductsListLambda } from './handler';
 
 describe('Lambda for getting products list', () => {
     async function testLambda(
@@ -49,7 +49,7 @@ describe('Lambda for getting products list', () => {
         it('should return response with status code = 500', async () => {
             await testLambda(productsGatewayMockThrowingError, {
                 statusCode: 500,
-                body: THROWEN_ERROR.message,
+                body: THROWEN_ERROR.stack,
             });
         });
     });

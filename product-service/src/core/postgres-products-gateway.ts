@@ -1,5 +1,5 @@
 import { Client } from 'pg';
-import { Product } from './product-model';
+import { Product, ProductOnlyWithId, ProductWithoutId } from './product-model';
 import { ProductsGateway } from './products-gateway';
 
 export type PostgresDBConnection = {
@@ -23,6 +23,25 @@ export class PostgresProductsGateway implements ProductsGateway {
         const products = await this.getProductsList();
 
         return products.find((p) => p.id === productId) ?? null;
+    }
+
+    async createProduct({
+        title, description, price, count,
+    }: ProductWithoutId) {
+        const results = await this.makeQuery<ProductOnlyWithId>(`
+            insert into products (title, description, price) values
+            ('${title}', '${description ?? ''}', ${price})
+            returning id;
+        `);
+
+        const createdProductId = results[0].id;
+
+        await this.makeQuery(`
+            insert into stocks (product_id, count) values
+            ('${createdProductId}', ${count ?? 0});
+        `);
+
+        return this.getProductById(createdProductId);
     }
 
     private async makeQuery<ResultRow>(query: string) {

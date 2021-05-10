@@ -22,7 +22,7 @@ export class PostgresProductsGateway implements ProductsGateway {
     async getProductById(productId: string) {
         const products = await this.getProductsList();
 
-        return products.find((p) => p.id === productId);
+        return products.find((p) => p.id === productId) ?? null;
     }
 
     private async makeQuery<ResultRow>(query: string) {

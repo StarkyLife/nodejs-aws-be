@@ -22,10 +22,13 @@ function createProductsServiceMock(productId: string) {
         price: 5,
     };
 
+    const THROWEN_ERROR = new Error('error on get by product Id');
+
     return {
         TEST_PRODUCT,
+        THROWEN_ERROR,
         throwingError: {
-            getProductById: jest.fn(() => Promise.reject(new Error())),
+            getProductById: jest.fn(() => Promise.reject(THROWEN_ERROR)),
         } as CanGetProductById,
         returningProduct: {
             getProductById: jest.fn(() => Promise.resolve(TEST_PRODUCT)),
@@ -36,65 +39,68 @@ function createProductsServiceMock(productId: string) {
     };
 }
 
-describe('Lambda for getting product by id', () => {
-    async function testLambda(
-        productId: string,
-        productsService: CanGetProductById,
-        expectedResponse: APIGatewayProxyStructuredResultV2,
-    ) {
-        const getProductByIdLambda = createLambdaForGettingProductById(productsService);
-        const response = await getProductByIdLambda(
+async function testLambda(
+    productId: string,
+    productsService: CanGetProductById,
+    expectedResponse: APIGatewayProxyStructuredResultV2,
+) {
+    const getProductByIdLambda = createLambdaForGettingProductById(productsService);
+    const response = await getProductByIdLambda(
+        {
+            ...emptyAPIGatewayEvent,
+            pathParameters: { productId },
+        },
+        null,
+        null,
+    );
+
+    expect(response).toEqual({
+        ...expectedResponse,
+        headers: CORS_HEADERS,
+    });
+}
+
+describe('Given function throwing error', () => {
+    it('should return response with statusCode = 500', async () => {
+        const productByIdGetterMock = createProductsServiceMock('');
+
+        await testLambda(
+            '',
+            productByIdGetterMock.throwingError,
             {
-                ...emptyAPIGatewayEvent,
-                pathParameters: { productId },
+                statusCode: 500,
+                body: productByIdGetterMock.THROWEN_ERROR.message,
             },
-            null,
-            null,
         );
-
-        expect(response).toEqual({
-            ...expectedResponse,
-            headers: CORS_HEADERS,
-        });
-    }
-
-    describe('Given function throwing error', () => {
-        it('should return response with statusCode = 500', async () => {
-            await testLambda(
-                '',
-                createProductsServiceMock('').throwingError,
-                { statusCode: 500 },
-            );
-        });
     });
+});
 
-    describe('Given function returning product', () => {
-        it('it should return response with statusCode = 200 and body = product with given id', async () => {
-            const testProductId = Math.random().toString();
-            const productByIdGetterMock = createProductsServiceMock(testProductId);
+describe('Given function returning product', () => {
+    it('it should return response with statusCode = 200 and body = product with given id', async () => {
+        const testProductId = Math.random().toString();
+        const productByIdGetterMock = createProductsServiceMock(testProductId);
 
-            await testLambda(
-                testProductId,
-                productByIdGetterMock.returningProduct,
-                {
-                    statusCode: 200,
-                    body: JSON.stringify(productByIdGetterMock.TEST_PRODUCT),
-                },
-            );
-            expect(productByIdGetterMock.returningProduct.getProductById).toHaveBeenCalledWith(testProductId);
-        });
+        await testLambda(
+            testProductId,
+            productByIdGetterMock.returningProduct,
+            {
+                statusCode: 200,
+                body: JSON.stringify(productByIdGetterMock.TEST_PRODUCT),
+            },
+        );
+        expect(productByIdGetterMock.returningProduct.getProductById).toHaveBeenCalledWith(testProductId);
     });
+});
 
-    describe('Given function returning null', () => {
-        it('it should return response with statusCode = 404', async () => {
-            await testLambda(
-                '',
-                createProductsServiceMock('').returningNull,
-                {
-                    statusCode: 404,
-                    body: 'Product not found',
-                },
-            );
-        });
+describe('Given function returning null', () => {
+    it('it should return response with statusCode = 404', async () => {
+        await testLambda(
+            '',
+            createProductsServiceMock('').returningNull,
+            {
+                statusCode: 404,
+                body: 'Product not found',
+            },
+        );
     });
 });

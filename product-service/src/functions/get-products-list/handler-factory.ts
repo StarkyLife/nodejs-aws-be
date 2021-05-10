@@ -11,7 +11,7 @@ export function createGetProductsListLambda(
 
             return createLambdaResponse.json(200, products);
         } catch (error) {
-            return createLambdaResponse.default(500);
+            return createLambdaResponse.default(500, error.message);
         }
     };
 }

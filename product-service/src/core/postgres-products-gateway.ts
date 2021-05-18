@@ -28,23 +28,29 @@ export class PostgresProductsGateway implements ProductsGateway {
     async createProduct({
         title, description, price, count,
     }: ProductWithoutId) {
-        const results = await this.makeQuery<ProductOnlyWithId>(`
-            insert into products (title, description, price) values
-            ('${title}', '${description ?? ''}', ${price})
-            returning id;
-        `);
+        const createdProductId = await this.makeTransaction(async (client) => {
+            const createdProducts = (
+                await client.query<ProductOnlyWithId>(`
+                    insert into products (title, description, price) values
+                    ('${title}', '${description ?? ''}', ${price})
+                    returning id;
+                `)
+            ).rows;
 
-        const createdProductId = results[0].id;
+            const productId = createdProducts[0].id;
 
-        await this.makeQuery(`
-            insert into stocks (product_id, count) values
-            ('${createdProductId}', ${count ?? 0});
-        `);
+            await client.query(`
+                insert into stocks (product_id, count) values
+                ('${productId}', ${count ?? 0});
+            `);
+
+            return productId;
+        });
 
         return this.getProductById(createdProductId);
     }
 
-    private async makeQuery<ResultRow>(query: string) {
+    private async getConnectedClient() {
         const client = new Client({
             ...this.dbInfo,
             ssl: {
@@ -55,15 +61,39 @@ export class PostgresProductsGateway implements ProductsGateway {
 
         await client.connect();
 
+        return client;
+    }
+
+    private async makeQuery<ResultRow>(query: string) {
+        const client = await this.getConnectedClient();
+
         try {
             const queryResult = await client.query<ResultRow>(query);
 
-            client.end();
-
             return queryResult.rows;
-        } catch (e) {
+        } finally {
             client.end();
+        }
+    }
+
+    private async makeTransaction<Result>(
+        transactionQueriesHandler: (connectedClient: Client) => Promise<Result>,
+    ) {
+        const client = await this.getConnectedClient();
+
+        try {
+            await client.query('BEGIN');
+
+            const result = await transactionQueriesHandler(client);
+
+            await client.query('COMMIT');
+
+            return result;
+        } catch (e) {
+            await client.query('ROLLBACK');
             throw e;
+        } finally {
+            client.end();
         }
     }
 }

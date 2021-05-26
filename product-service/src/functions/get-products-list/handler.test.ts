@@ -1,15 +1,15 @@
-import { Product } from '@core/product-model';
-import { CanGetProductsList } from '@core/products-service-types';
+import { CanGetProductsList } from '@core/products-gateway';
 import { CORS_HEADERS } from '@libs/cors-headers';
+import { TEST_PRODUCTS } from '@libs/doubles/products-mocks';
 import { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { createGetProductsListLambda } from './handler-factory';
+import { createGetProductsListLambda } from './handler';
 
 describe('Lambda for getting products list', () => {
     async function testLambda(
-        productsService: CanGetProductsList,
+        productsGateway: CanGetProductsList,
         expectedResponse: APIGatewayProxyStructuredResultV2,
     ) {
-        const getProductsList = createGetProductsListLambda(productsService);
+        const getProductsList = createGetProductsListLambda(productsGateway);
         const actualResponse = await getProductsList(null, null, null);
 
         expect(actualResponse).toEqual({
@@ -19,37 +19,37 @@ describe('Lambda for getting products list', () => {
     }
 
     describe('Given function that returns array of products', () => {
-        let testProductsList: Product[];
-        let productsServiceMockReturningProducts: CanGetProductsList;
+        let productsGatewayMockReturningProducts: CanGetProductsList;
 
         beforeEach(() => {
-            testProductsList = [{ id: '1', title: 'product 1', price: 5 }];
-            productsServiceMockReturningProducts = {
-                getProductsList: jest.fn(() => testProductsList),
+            productsGatewayMockReturningProducts = {
+                getProductsList: jest.fn(() => Promise.resolve(TEST_PRODUCTS)),
             };
         });
 
         it('should return response with status code = 200 and body = products list', async () => {
-            const stringifiedProductsListResponse = JSON.stringify(testProductsList);
+            const stringifiedProductsListResponse = JSON.stringify(TEST_PRODUCTS);
 
-            await testLambda(productsServiceMockReturningProducts, {
+            await testLambda(productsGatewayMockReturningProducts, {
                 statusCode: 200,
                 body: stringifiedProductsListResponse,
             });
         });
     });
     describe('Given function that throws an error', () => {
-        let productsServiceMockThrowingError: CanGetProductsList;
+        const THROWEN_ERROR = new Error('error on products get');
+        let productsGatewayMockThrowingError: CanGetProductsList;
 
         beforeEach(() => {
-            productsServiceMockThrowingError = {
-                getProductsList: jest.fn(() => { throw new Error(); }),
+            productsGatewayMockThrowingError = {
+                getProductsList: jest.fn(() => Promise.reject(THROWEN_ERROR)),
             };
         });
 
         it('should return response with status code = 500', async () => {
-            await testLambda(productsServiceMockThrowingError, {
+            await testLambda(productsGatewayMockThrowingError, {
                 statusCode: 500,
+                body: THROWEN_ERROR.stack,
             });
         });
     });

@@ -1,0 +1,1 @@
+select id, count, title, description, price from stocks s left join products p on p.id = s.product_id;

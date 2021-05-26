@@ -1,6 +1,6 @@
-import { Product } from './product-model';
+import { Product } from '@core/product-model';
 
-export const productsMockList: Product[] = [
+export const TEST_PRODUCTS: Product[] = [
     {
         count: 4,
         description: 'Short Product Description1',

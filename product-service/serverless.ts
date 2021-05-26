@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import { getProductsListAWSFunction } from '@functions/get-products-list';
 import { getProductByIdAWSFunction } from '@functions/get-product-by-id';
+import { createProductAWSFunction } from '@functions/create-product';
 
 const serverlessConfiguration: AWS = {
     service: 'product-service',
@@ -29,6 +30,7 @@ const serverlessConfiguration: AWS = {
     functions: {
         getProductsListAWSFunction,
         getProductByIdAWSFunction,
+        createProductAWSFunction,
     },
 };
 

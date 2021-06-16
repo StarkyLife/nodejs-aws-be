@@ -10,7 +10,7 @@ export const createProductAWSFunction: AWS['functions'][0] = {
             path: 'products',
             cors: true,
             request: {
-                schema: {
+                schemas: {
                     'application/json': schema,
                 },
             },
